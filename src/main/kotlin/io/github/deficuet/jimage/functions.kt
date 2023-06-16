@@ -1,5 +1,6 @@
 package io.github.deficuet.jimage
 
+import ar.com.hjg.pngj.FilterType
 import java.awt.Graphics2D
 import java.awt.Image
 import java.awt.RenderingHints
@@ -7,7 +8,10 @@ import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import javax.imageio.ImageIO
+import it.geosolutions.imageio.plugins.png.PNGWriter
 
 inline fun BufferedImage(
     width: Int, height: Int, type: Int,
@@ -76,8 +80,12 @@ fun BufferedImage.flipY(): BufferedImage {
     ).filter(this, null)
 }
 
-fun BufferedImage.resize(w: Int, h: Int) = BufferedImage(w, h, type) {
-    drawImage(getScaledInstance(w, h, Image.SCALE_SMOOTH), 0, 0, null)
+fun BufferedImage.resize(width: Int, hidth: Int) = BufferedImage(width, hidth, type) {
+    drawImage(getScaledInstance(width, hidth, Image.SCALE_SMOOTH), 0, 0, null)
+}
+
+fun BufferedImage.fancyResize(width: Int, hidth: Int) = fancyBufferedImage(width, height, type) {
+    drawImage(this@fancyResize, 0, 0, width, height, null)
 }
 
 fun BufferedImage.paste(other: Image, x: Int, y: Int) = edit {
@@ -91,4 +99,21 @@ fun BufferedImage.toByteArray(format: String): ByteArray {
         ImageIO.write(this, format, it)
         it.toByteArray()
     }
+}
+
+fun BufferedImage.save(path: String): BufferedImage {
+    val imageFile = File(path)
+    ImageIO.write(this, imageFile.extension, imageFile)
+    return this
+}
+
+fun BufferedImage.savePng(path: String, compressionLevel: Int = 7): BufferedImage {
+    assert(type == BufferedImage.TYPE_4BYTE_ABGR)
+    FileOutputStream(File(path)).use { output ->
+        PNGWriter().writePNG(
+            this, output, (9f - compressionLevel) / 9f,
+            FilterType.FILTER_DEFAULT
+        )
+    }
+    return this
 }
