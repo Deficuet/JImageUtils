@@ -80,12 +80,12 @@ fun BufferedImage.flipY(): BufferedImage {
     ).filter(this, null)
 }
 
-fun BufferedImage.resize(width: Int, hidth: Int) = BufferedImage(width, hidth, type) {
-    drawImage(getScaledInstance(width, hidth, Image.SCALE_SMOOTH), 0, 0, null)
+fun BufferedImage.resize(w: Int, h: Int) = BufferedImage(w, h, type) {
+    drawImage(getScaledInstance(w, h, Image.SCALE_SMOOTH), 0, 0, null)
 }
 
-fun BufferedImage.fancyResize(width: Int, hidth: Int) = fancyBufferedImage(width, height, type) {
-    drawImage(this@fancyResize, 0, 0, width, height, null)
+fun BufferedImage.fancyResize(w: Int, h: Int) = fancyBufferedImage(w, h, type) {
+    drawImage(this@fancyResize, 0, 0, w, h, null)
 }
 
 fun BufferedImage.paste(other: Image, x: Int, y: Int) = edit {
