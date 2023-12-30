@@ -82,7 +82,7 @@ fun BufferedImage.flipY(): BufferedImage {
 
 fun BufferedImage.quadrantRotate(times: Int = 1): BufferedImage {
     return when (times % 4) {
-        0 -> this
+        0 -> this.copy()
         1 -> AffineTransformOpCollection.rotate90deg(this).filter(this, null)
         2 -> AffineTransformOpCollection.rotate180deg(this).filter(this, null)
         else -> AffineTransformOpCollection.rotate270deg(this).filter(this, null)
