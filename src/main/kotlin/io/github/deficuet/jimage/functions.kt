@@ -1,17 +1,12 @@
 package io.github.deficuet.jimage
 
-import ar.com.hjg.pngj.FilterType
 import java.awt.Graphics2D
 import java.awt.Image
 import java.awt.RenderingHints
-import java.awt.geom.AffineTransform
-import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import javax.imageio.ImageIO
-import it.geosolutions.imageio.plugins.png.PNGWriter
 
 inline fun BufferedImage(
     width: Int, height: Int, type: Int,
@@ -71,13 +66,27 @@ inline fun BufferedImage.fancyEdit(processor: Graphics2D.(BufferedImage) -> Unit
     }
 }
 
+inline fun <T> BufferedImage.use(block: BufferedImage.() -> T): T {
+    val ret = this.block()
+    flush()
+    return ret
+}
+
+fun BufferedImage.flipX(): BufferedImage {
+    return AffineTransformOpCollection.flipX(this).filter(this, null)
+}
+
 fun BufferedImage.flipY(): BufferedImage {
-    return AffineTransformOp(
-        AffineTransform.getScaleInstance(1.0, -1.0).apply {
-            translate(0.0, -height.toDouble())
-        },
-        AffineTransformOp.TYPE_NEAREST_NEIGHBOR
-    ).filter(this, null)
+    return AffineTransformOpCollection.flipY(this).filter(this, null)
+}
+
+fun BufferedImage.quadrantRotate(times: Int = 1): BufferedImage {
+    return when (times % 4) {
+        0 -> this
+        1 -> AffineTransformOpCollection.rotate90deg(this).filter(this, null)
+        2 -> AffineTransformOpCollection.rotate180deg(this).filter(this, null)
+        else -> AffineTransformOpCollection.rotate270deg(this).filter(this, null)
+    }
 }
 
 fun BufferedImage.resize(w: Int, h: Int) = BufferedImage(w, h, type) {
@@ -104,16 +113,5 @@ fun BufferedImage.toByteArray(format: String): ByteArray {
 fun BufferedImage.save(path: String): BufferedImage {
     val imageFile = File(path)
     ImageIO.write(this, imageFile.extension, imageFile)
-    return this
-}
-
-fun BufferedImage.savePng(path: String, compressionLevel: Int = 7): BufferedImage {
-    assert(type == BufferedImage.TYPE_4BYTE_ABGR)
-    FileOutputStream(File(path)).use { output ->
-        PNGWriter().writePNG(
-            this, output, (9f - compressionLevel) / 9f,
-            FilterType.FILTER_DEFAULT
-        )
-    }
     return this
 }
