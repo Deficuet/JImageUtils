@@ -93,8 +93,7 @@ fun BufferedImage.toByteArray(format: String): ByteArray {
     }
 }
 
-fun BufferedImage.save(path: String): BufferedImage {
-    val imageFile = File(path)
-    ImageIO.write(this, imageFile.extension, imageFile)
+fun BufferedImage.save(file: File): BufferedImage {
+    ImageIO.write(this, file.extension, file)
     return this
 }
