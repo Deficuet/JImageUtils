@@ -84,11 +84,11 @@ fun BufferedImage.paste(other: Image, x: Int, y: Int) = edit {
     drawImage(other, x, y, null)
 }
 
-fun BufferedImage.dynamicPaste(other: BufferedImage, x: Int, y: Int): BufferedImage {
+fun BufferedImage.pasteExtension(other: BufferedImage, x: Int, y: Int): BufferedImage {
     val newW = x + other.width; val newH = y + other.height
     return if (newW > width || newH > height) {
-        val newImage = BufferedImage(newW, newH, type) {
-            drawImage(this@dynamicPaste, 0, 0, null)
+        val newImage = BufferedImage(maxOf(newW, width), maxOf(newH, height), type) {
+            drawImage(this@pasteExtension, 0, 0, null)
             drawImage(other, x, y, null)
         }
         this.flush()
